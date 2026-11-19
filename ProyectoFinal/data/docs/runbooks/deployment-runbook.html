@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="doc_id" content="deployment-runbook">
+  <meta name="doc_type" content="runbook">
+  <meta name="tags" content="deployment, kubernetes, rollback, ci-cd">
+  <title>Deployment and Rollback Runbook</title>
+</head>
+<body>
+  <h1>Deployment and Rollback Runbook</h1>
+  <p>This runbook covers how services are released to production through the CI/CD pipeline and how to roll back a bad release.</p>
+
+  <h2>Pipeline stages</h2>
+  <ol>
+    <li><strong>Build</strong>: Docker image tagged with the Git commit SHA. Images tagged <code>latest</code> are rejected.</li>
+    <li><strong>Test</strong>: lint, type check, unit and integration tests, dependency vulnerability scan.</li>
+    <li><strong>Staging</strong>: automatic deploy and smoke tests against staging.</li>
+    <li><strong>Production</strong>: canary release to 10% of pods for 15 minutes, then 100% if error rate and p95 latency stay within the SLO.</li>
+  </ol>
+
+  <h2>Deployment windows</h2>
+  <p>Production deploys are allowed Monday to Thursday, 09:00 to 16:00 local time. Friday and weekend deploys need approval from the on-call lead. Changes freeze during the last 3 business days of each quarter.</p>
+
+  <h2>Database migrations</h2>
+  <p>Migrations run as a separate job before the new pods start and must be backwards compatible with the previous release (expand and contract pattern): add the new column first, deploy code that writes both, backfill, and remove the old column in a later release.</p>
+
+  <h2>Rollback procedure</h2>
+  <p>Roll back as soon as the canary breaches the SLO, without waiting to find the root cause.</p>
+  <pre><code class="language-bash">kubectl rollout history deployment/orders-api -n orders
+kubectl rollout undo deployment/orders-api -n orders --to-revision=41
+kubectl rollout status deployment/orders-api -n orders --timeout=5m</code></pre>
+  <p>If the release included a migration, do not roll back the database; the expand and contract pattern guarantees the previous version still works with the new schema.</p>
+
+  <h2>After the rollback</h2>
+  <ul>
+    <li>Announce it in the #deployments channel with the ticket id.</li>
+    <li>Open an incident ticket and attach the dashboard links and the correlation ids of failing requests.</li>
+    <li>Write a blameless post-mortem within 5 business days for any customer-facing impact.</li>
+  </ul>
+</body>
+</html>

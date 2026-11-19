@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dev Knowledge Assistant</title>
+  <meta name="description" content="Ask the engineering documentation: coding standards, runbooks, troubleshooting guides, snippets and past incidents, with cited answers.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2322C55E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='4 17 10 11 4 5'/%3E%3Cline x1='12' y1='19' x2='20' y2='19'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- SVG icon sprite (Lucide paths). Icons are decorative unless labelled. -->
+  <svg width="0" height="0" class="sprite" aria-hidden="true">
+    <symbol id="i-terminal" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></symbol>
+    <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
+    <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></symbol>
+    <symbol id="i-bug" viewBox="0 0 24 24"><path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/><path d="M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5"/><path d="M6 13H2"/><path d="M3 21c0-2.1 1.7-3.9 3.8-4"/><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/><path d="M22 13h-4"/><path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></symbol>
+    <symbol id="i-git" viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#composer-input">Skip to question box</a>
+
+  <div class="app">
+    <!-- Sidebar ---------------------------------------------------------- -->
+    <aside class="sidebar" id="sidebar" aria-label="Knowledge base">
+      <div class="brand">
+        <span class="brand-mark"><svg class="icon"><use href="#i-terminal"/></svg></span>
+        <div>
+          <p class="brand-name">devkb<span class="caret">_</span></p>
+          <p class="brand-sub">Knowledge Assistant</p>
+        </div>
+        <button class="icon-btn only-mobile" id="close-sidebar" aria-label="Close menu"><svg class="icon"><use href="#i-x"/></svg></button>
+      </div>
+
+      <button class="btn btn-primary btn-block" id="new-chat">
+        <svg class="icon"><use href="#i-plus"/></svg> New conversation
+      </button>
+
+      <section class="side-section">
+        <h2 class="side-title">Search scope</h2>
+        <div class="chips" id="scope-chips" role="radiogroup" aria-label="Limit answers to one document type"></div>
+      </section>
+
+      <section class="side-section grow">
+        <h2 class="side-title">Documents <span class="count" id="doc-count"></span></h2>
+        <nav id="doc-list" class="doc-list" aria-label="Documents in the knowledge base">
+          <div class="skeleton-line"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div>
+        </nav>
+      </section>
+
+      <footer class="side-footer">
+        <div class="status" id="status" role="status">
+          <span class="dot"></span><span id="status-text">Connecting…</span>
+        </div>
+        <button class="btn btn-ghost btn-block" id="open-settings">
+          <svg class="icon"><use href="#i-key"/></svg> API key
+        </button>
+      </footer>
+    </aside>
+    <div class="scrim" id="scrim" hidden></div>
+
+    <!-- Main ---------------------------------------------------------------- -->
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn only-mobile" id="open-sidebar" aria-label="Open menu" aria-controls="sidebar"><svg class="icon"><use href="#i-menu"/></svg></button>
+        <div class="mode-switch" role="tablist" aria-label="Mode">
+          <button role="tab" id="tab-ask" aria-selected="true" aria-controls="thread" class="mode-btn active" data-mode="ask">
+            <svg class="icon"><use href="#i-book"/></svg> Ask the docs
+          </button>
+          <button role="tab" id="tab-snippets" aria-selected="false" aria-controls="thread" class="mode-btn" data-mode="snippets">
+            <svg class="icon"><use href="#i-code"/></svg> Find snippets
+          </button>
+          <button role="tab" id="tab-review" aria-selected="false" aria-controls="review" class="mode-btn" data-mode="review" hidden>
+            <svg class="icon"><use href="#i-inbox"/></svg> Review <span class="tab-count" id="review-count" hidden></span>
+          </button>
+        </div>
+        <span class="scope-pill" id="scope-pill" hidden></span>
+      </header>
+
+      <section class="thread" id="thread" aria-live="polite" aria-busy="false">
+        <div class="hero" id="hero">
+          <p class="eyebrow">Internal engineering docs · cited answers</p>
+          <h1 class="hero-title">What are you building<span class="caret">_</span></h1>
+          <p class="hero-sub">Ask about coding standards, APIs, deployments, incidents and approved code. Every answer cites its source as <code>[doc_id]</code>, and says so when the docs do not cover it.</p>
+          <div class="suggestions" id="suggestions"></div>
+        </div>
+      </section>
+
+      <section class="review" id="review" aria-labelledby="review-title" hidden>
+        <header class="review-head">
+          <div>
+            <h1 class="review-title" id="review-title">Review queue</h1>
+            <p class="muted">General answers the docs could not give. Edit, then approve to publish them as company documentation. Most-asked questions come first.</p>
+          </div>
+          <div class="segmented" role="radiogroup" aria-label="Filter drafts by status" id="review-filter">
+            <button type="button" role="radio" aria-checked="true" data-status="pending">Pending</button>
+            <button type="button" role="radio" aria-checked="false" data-status="approved">Approved</button>
+            <button type="button" role="radio" aria-checked="false" data-status="rejected">Rejected</button>
+          </div>
+        </header>
+        <div class="review-body">
+          <nav class="draft-list" id="draft-list" aria-label="Drafts"></nav>
+          <div class="draft-pane" id="draft-pane"></div>
+        </div>
+      </section>
+
+      <form class="composer" id="composer" autocomplete="off">
+        <label for="composer-input" class="composer-label" id="composer-label">Ask a technical question</label>
+        <div class="composer-box">
+          <textarea id="composer-input" rows="1" maxlength="2000" required
+            placeholder="e.g. How should I retry calls to a flaky downstream API?"
+            aria-describedby="composer-hint"></textarea>
+          <button type="submit" class="btn btn-primary send-btn" id="send-btn">
+            <svg class="icon"><use href="#i-send"/></svg><span class="send-label">Ask</span>
+          </button>
+        </div>
+        <p class="composer-hint" id="composer-hint"><kbd>Enter</kbd> to send · <kbd>Shift</kbd>+<kbd>Enter</kbd> new line</p>
+      </form>
+    </main>
+
+    <!-- Document drawer ----------------------------------------------------- -->
+    <aside class="drawer" id="drawer" aria-labelledby="drawer-title" role="dialog" aria-modal="false" hidden>
+      <header class="drawer-head">
+        <div>
+          <p class="drawer-meta" id="drawer-meta"></p>
+          <h2 class="drawer-title" id="drawer-title">Document</h2>
+        </div>
+        <button class="icon-btn" id="close-drawer" aria-label="Close document"><svg class="icon"><use href="#i-x"/></svg></button>
+      </header>
+      <div class="drawer-body markdown" id="drawer-body"></div>
+    </aside>
+  </div>
+
+  <!-- Settings dialog ------------------------------------------------------- -->
+  <dialog class="modal" id="settings" aria-labelledby="settings-title">
+    <form method="dialog" id="settings-form">
+      <h2 id="settings-title">Connect to the API</h2>
+      <p class="muted">Requests are authenticated with the <code>X-API-Key</code> header. The key is stored only in this browser.</p>
+      <label for="api-key-input">API key</label>
+      <input id="api-key-input" type="password" required autocomplete="off" spellcheck="false" aria-describedby="api-key-help api-key-error">
+      <p class="help" id="api-key-help">Use one of the keys in <code>API_KEYS</code> from the project's <code>.env</code>.</p>
+      <p class="field-error" id="api-key-error" role="alert"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="cancel-settings">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="save-settings">Save and connect</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="confirm" aria-labelledby="confirm-title">
+    <form method="dialog" id="confirm-form">
+      <h2 id="confirm-title">Confirm</h2>
+      <p class="muted" id="confirm-message"></p>
+      <div id="confirm-note-wrap" hidden>
+        <label for="confirm-note">Reason (optional)</label>
+        <textarea id="confirm-note" rows="3" maxlength="500"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="confirm-cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="confirm-ok">Confirm</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

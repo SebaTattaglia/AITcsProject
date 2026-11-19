@@ -1,0 +1,62 @@
+[
+  {
+    "key": "DEV-1042",
+    "summary": "Orders API returns 500 under load: QueuePool limit reached",
+    "component": "orders-api",
+    "status": "Resolved",
+    "priority": "High",
+    "environment": "production",
+    "labels": ["database", "connection-pool", "sqlalchemy"],
+    "symptoms": "During the Black Friday peak the orders API started failing with sqlalchemy.exc.TimeoutError: QueuePool limit of size 5 overflow 10 reached. p95 latency went from 180 ms to 30 s.",
+    "root_cause": "When the payment gateway timed out, PaymentGatewayUnavailableError was raised before session.close(), so each failed checkout leaked one connection until the pool was exhausted.",
+    "resolution": "Replaced manual session handling with the get_db_session() context manager (db_session snippet), moved the payment call outside the transaction, and added an alert on the db_pool_checked_out metric. Deployed in release 2026.11.3."
+  },
+  {
+    "key": "DEV-1077",
+    "summary": "Customer sync job hangs forever when CRM is slow",
+    "component": "customer-sync-worker",
+    "status": "Resolved",
+    "priority": "Medium",
+    "environment": "production",
+    "labels": ["http", "timeout", "requests"],
+    "symptoms": "The nightly customer sync job never finished and there were no errors in the logs. A thread dump showed workers blocked on socket.recv inside requests.",
+    "root_cause": "requests.get() was called without a timeout. The CRM accepted the connection but stopped responding, so the call blocked indefinitely.",
+    "resolution": "Added timeout=(3.05, 10) to every call, wrapped the client with retry_with_backoff (max 3 attempts), and reused a single requests.Session. Added a lint rule that flags requests calls without timeout."
+  },
+  {
+    "key": "DEV-1103",
+    "summary": "Invoices service fails to start after credential rotation",
+    "component": "invoices-api",
+    "status": "Resolved",
+    "priority": "High",
+    "environment": "staging",
+    "labels": ["secrets", "vault", "database"],
+    "symptoms": "After the 90-day rotation every new pod crashed with 'password authentication failed for user invoices'.",
+    "root_cause": "The database password had been copied into a ConfigMap months ago instead of being read from Vault, so the rotated password never reached the service.",
+    "resolution": "Removed the password from the ConfigMap, injected it from Vault as DB_PASSWORD and restarted the deployment with kubectl rollout restart. Added a CI check that rejects secrets in Kubernetes manifests."
+  },
+  {
+    "key": "DEV-1150",
+    "summary": "Duplicate payments when mobile app retries checkout",
+    "component": "payments-api",
+    "status": "Resolved",
+    "priority": "Critical",
+    "environment": "production",
+    "labels": ["api", "idempotency", "retry"],
+    "symptoms": "Some customers were charged twice. Logs showed two POST /api/v1/payments requests a few seconds apart with the same cart.",
+    "root_cause": "The mobile client retried POST /payments on a read timeout, and the endpoint was not idempotent.",
+    "resolution": "Implemented the Idempotency-Key header on POST /payments (stored for 24 hours) as required by the REST API guidelines, and changed the client to send the same key on retries."
+  },
+  {
+    "key": "DEV-1188",
+    "summary": "Search endpoint p95 latency above SLO after catalog import",
+    "component": "catalog-api",
+    "status": "Resolved",
+    "priority": "Medium",
+    "environment": "production",
+    "labels": ["database", "performance", "index"],
+    "symptoms": "GET /api/v1/products?category=... p95 went from 120 ms to 2.4 s after importing 3 million products; some requests hit the 5 s statement timeout.",
+    "root_cause": "Sequential scan on products.category_id (no index) plus an N+1 query loading product images in a loop.",
+    "resolution": "Created the index with CREATE INDEX CONCURRENTLY idx_products_category ON products(category_id) and used selectinload for images. p95 back to 95 ms."
+  }
+]

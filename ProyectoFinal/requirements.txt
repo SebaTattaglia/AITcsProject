@@ -1,0 +1,26 @@
+# --- Backend (Lesson 1) ---
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.7
+python-dotenv>=1.0
+
+# --- n8n LLM webhook (same approach as the Incident2KB reference project) ---
+requests>=2.32
+
+# --- RAG (Lesson 3) + agentic graph (Lesson 7) ---
+langgraph>=1.0
+langchain-core>=1.0
+tiktoken>=0.7
+numpy>=2.0
+scikit-learn>=1.5
+
+# --- Document loaders (Markdown / HTML / PDF) ---
+beautifulsoup4>=4.12
+pypdf>=5.0
+
+# --- MCP server for IDEs (Lesson 8) ---
+mcp>=2.0
+
+# --- Tests ---
+pytest>=8.0
+httpx>=0.27

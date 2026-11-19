@@ -1,0 +1,91 @@
+{
+  // Configuraciones de depuración para ProyectoFinal (Dev Knowledge Assistant).
+  // Requiere la extensión "Python Debugger" (ms-python.debugpy) de VS Code.
+  "version": "0.2.0",
+  "inputs": [
+    {
+      "id": "pregunta",
+      "type": "promptString",
+      "description": "Pregunta para el asistente",
+      "default": "How should I retry calls to a flaky downstream API?"
+    }
+  ],
+  "configurations": [
+    {
+      // API + chat UI en http://127.0.0.1:8001 (sin --reload para que los breakpoints funcionen bien)
+      "name": "API FastAPI (uvicorn :8001)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["app.main:app", "--port", "8001"],
+      "cwd": "${workspaceFolder}",
+      "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "envFile": "${workspaceFolder}/.env",
+      "jinja": true,
+      "justMyCode": true,
+      "console": "integratedTerminal"
+    },
+    {
+      // Recorre todo el grafo RAG desde la terminal (usa n8n vía ngrok)
+      "name": "scripts/ask.py (pregunta al asistente)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/ask.py",
+      "args": ["${input:pregunta}"],
+      "cwd": "${workspaceFolder}",
+      "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true,
+      "console": "integratedTerminal"
+    },
+    {
+      // Cliente MCP de prueba; con subProcess también se puede pausar dentro de mcp_server/server.py
+      "name": "MCP client_demo.py",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/mcp_server/client_demo.py",
+      "cwd": "${workspaceFolder}",
+      "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "envFile": "${workspaceFolder}/.env",
+      "subProcess": true,
+      "justMyCode": true,
+      "console": "integratedTerminal"
+    },
+    {
+      // Todos los tests (offline, con FakeLLM)
+      "name": "Pytest: todos los tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-q"],
+      "cwd": "${workspaceFolder}",
+      "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "justMyCode": false,
+      "console": "integratedTerminal"
+    },
+    {
+      // Solo el archivo de test que tengas abierto
+      "name": "Pytest: archivo actual",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-q", "${file}"],
+      "cwd": "${workspaceFolder}",
+      "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "justMyCode": false,
+      "console": "integratedTerminal"
+    },
+    {
+      // Cualquier script .py que tengas abierto
+      "name": "Python: archivo actual",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true,
+      "console": "integratedTerminal"
+    }
+  ]
+}
